@@ -21,8 +21,8 @@ class DNN:
         self.INITIAL_EPSILON = INITIAL_EPSILON
         self.FINAL_EPSILON = FINAL_EPSILON
 
-        self.s = tf.placeholder(tf.float32, [None, self.state_num], name ='s')
-        self.a = tf.placeholder(tf.float32, [None, self.action_num], name ='a')
+        self.s = tf.placeholder(tf.float32, [None, self.state_num], name ='s')   #placeholder for state
+        self.a = tf.placeholder(tf.float32, [None, self.action_num], name ='a')     #placeholder for action
         self.dqn = self.create_dqn(self.s, 'dqn')
         self.dqn_params = self.get_params('dqn')
         self.load_dqn_params = self.load_params('dqn')
@@ -156,7 +156,7 @@ class DQN:
         return self.sess.run(self.load)
 
     def select_action(self, a_hat, episode):
-        epsilon = self.INITIAL_EPSILON - episode * (self.INITIAL_EPSILON - self.FINAL_EPSILON) / self.max_episode
+        epsilon = self.INITIAL_EPSILON - episode * (self.INITIAL_EPSILON - self.FINAL_EPSILON) / self.max_episode            #epsilon greedy
         random_index = np.array(np.random.uniform(size = (self.M)) < epsilon, dtype = np.int32)
         random_action = np.random.randint(0, high = self.action_num, size = (self.M))
         action_set = np.vstack([a_hat, random_action])
