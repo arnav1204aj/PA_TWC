@@ -153,7 +153,7 @@ def Test_dqn_time(weight_file, max_episode, Ns, fd, max_dis, maxM):
             for i in range(int(Ns)-1):
                 st = time.time()
                 p = dqn.predict_p(s_actor)
-                time_cost = time_cost + time.time() - st
+                time_cost = time_cost + time.time() - st     #time for prediction
                 s_actor_next, _, _, _ = env.step(p)
                 s_actor = s_actor_next
     return time_cost
