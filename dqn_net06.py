@@ -41,7 +41,7 @@ def Train(sess, env, weight_file):
     deque = ReplayBuffer(buffer_size)
     interval = 100
     st = time.time()
-    reward_hist = list()
+    reward_hist = list()  //reward of each episode
     for k in range(1, max_episode+1):  
         reward_dqn_list = list()
         s_actor, _ = env.reset()
