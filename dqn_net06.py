@@ -41,24 +41,24 @@ def Train(sess, env, weight_file):
     deque = ReplayBuffer(buffer_size)
     interval = 100
     st = time.time()
-    reward_hist = list()
+    reward_hist = list()                              #reward of each episode
     for k in range(1, max_episode+1):  
-        reward_dqn_list = list()
+        reward_dqn_list = list()                        # reward of each step
         s_actor, _ = env.reset()
         for i in range(int(Ns)-1):
-            a = dqn.predict_a(s_actor)
-            p, a = dqn.select_action(a, k)
-            s_actor_next, _, rate, r = env.step(p)
-            deque.add(s_actor, a, rate)
+            a = dqn.predict_a(s_actor)                  #max reward action
+            p, a = dqn.select_action(a, k)               #exploration/exploitation
+            s_actor_next, _, rate, r = env.step(p)       #reward
+            deque.add(s_actor, a, rate)                  #addition to replay buffer
             s_actor = s_actor_next
             reward_dqn_list.append(r)
-        if deque.size() > batch_size:
+        if deque.size() > batch_size:                 #size>batchsize then train using data sampled till now
             batch_s, batch_a, batch_r = deque.sample_batch(batch_size)
             dqn.train(batch_s, batch_a, batch_r)
             
-        reward_hist.append(np.mean(reward_dqn_list))   # bps/Hz per link
+        reward_hist.append(np.mean(reward_dqn_list))   # mean reward of one episode
         if k % interval == 0: 
-            reward = np.mean(reward_hist[-interval:])
+            reward = np.mean(reward_hist[-interval:])  #mean of reward of k episodes taken every k intervals
             if reward > max_reward:
                 dnn.save_params()
                 max_reward = reward
@@ -71,12 +71,12 @@ def Test(sess, env, weight_file):
     max_episode = 100
     Ns = 5e2+1
     env.set_Ns(Ns) 
-    dnn = DNN(env, weight_file)
+    dnn = DNN(env, weight_file)   
     dqn = DQN(sess, dnn)
     
     tf.global_variables_initializer().run()
     dqn.load_params()
-    st = time.time()
+    st = time.time()     #current time
     reward_hist = list()
     for k in range(1, max_episode+1):  
         reward_dqn_list = list()
@@ -89,7 +89,7 @@ def Test(sess, env, weight_file):
         reward_hist.append(np.mean(reward_dqn_list))   # bps/Hz per link
         print("Episode(test):%d  DQN: %.3f  Time cost: %.2fs" 
               %(k, reward_hist[-1], time.time()-st))
-        st = time.time()
+        st = time.time()    #update to current time
     print("Test average rate: %.3f" %(np.mean(reward_hist)))
     return reward_hist
     
