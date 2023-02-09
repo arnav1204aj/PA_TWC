@@ -17,7 +17,8 @@ dtype = np.float32
 
 class Env_cellular():
     def __init__(self, fd, Ts, n_x, n_y, L, C, maxM, min_dis, max_dis, max_p, p_n, power_num):
-        self.fd = fd 
+        self.fd = fd     
+
         self.Ts = Ts
         self.n_x = n_x
         self.n_y = n_y
@@ -29,6 +30,20 @@ class Env_cellular():
         self.max_p = max_p #dBm
         self.p_n = p_n     #dBm
         self.power_num = power_num
+        """fd: a frequency parameter.
+Ts: a time slot parameter.
+n_x: number of cells in x-direction.
+n_y: number of cells in y-direction.
+L: number of cells per BS in one direction.
+C: number of channels.
+maxM: maximum number of users that can be served by one BS.
+min_dis: minimum distance between users and BSs.
+max_dis: maximum distance between users and BSs.
+max_p: maximum power of BSs in dBm.
+p_n: thermal noise power in dBm.
+power_num: number of power levels."""
+        
+        
         
         self.c = 3*self.L*(self.L+1) + 1 # adjascent BS
         self.K = self.maxM * self.c # maximum adjascent users, including itself
@@ -36,24 +51,24 @@ class Env_cellular():
         self.state_num = 3*self.C + 2    #  C + 1
         self.N = self.n_x * self.n_y # BS number
         self.M = self.N * self.maxM # maximum users
-        self.W = np.ones((self.M), dtype = dtype)         #[M]
-        self.sigma2 = 1e-3*pow(10., self.p_n/10.)
-        self.maxP = 1e-3*pow(10., self.max_p/10.)
+        self.W = np.ones((self.M), dtype = dtype)         #[M] array of ones
+        self.sigma2 = 1e-3*pow(10., self.p_n/10.)       #thermal noise power
+        self.maxP = 1e-3*pow(10., self.max_p/10.)         #maxpower
         self.p_array, self.p_list = self.generate_environment()
         
     def get_power_set(self, min_p):
-        power_set = np.hstack([np.zeros((1), dtype=dtype), 1e-3*pow(10., np.linspace(min_p, self.max_p, self.power_num-1)/10.)])
+        power_set = np.hstack([np.zeros((1), dtype=dtype), 1e-3*pow(10., np.linspace(min_p, self.max_p, self.power_num-1)/10.)])    #linear spacing of power
         return power_set
         
     def set_Ns(self, Ns):
-        self.Ns = int(Ns)
+        self.Ns = int(Ns)   #number of steps in each episode
         
     def generate_H_set(self):
         '''
         Jakes model
         '''
-        H_set = np.zeros([self.M,self.K,self.Ns], dtype=dtype)
-        pho = np.float32(scipy.special.k0(2*np.pi*self.fd*self.Ts))
+        H_set = np.zeros([self.M,self.K,self.Ns], dtype=dtype)    #initialize as 0
+        pho = np.float32(scipy.special.k0(2*np.pi*self.fd*self.Ts))   #bessel function
         H_set[:,:,0] = np.kron(np.sqrt(0.5*(np.random.randn(self.M, self.c)**2+np.random.randn(self.M, self.c)**2)), np.ones((1,self.maxM), dtype=np.int32))
         for i in range(1,self.Ns):
             H_set[:,:,i] = H_set[:,:,i-1]*pho + np.sqrt((1.-pho**2)*0.5*(np.random.randn(self.M, self.K)**2+np.random.randn(self.M, self.K)**2))
