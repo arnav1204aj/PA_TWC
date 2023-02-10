@@ -148,16 +148,16 @@ power_num: number of power levels."""
         1.H2[t]   
         2.p[t]
         '''
-        maxC = 1000.
-        H2 = self.H2_set[:,:,self.count]
-        p_extend = np.concatenate([P, np.zeros((1), dtype=dtype)], axis=0)
-        p_matrix = p_extend[self.p_array]
-        path_main = H2[:,0] * p_matrix[:,0]
-        path_inter = np.sum(H2[:,1:] * p_matrix[:,1:], axis=1)
-        sinr = np.minimum(path_main / (path_inter + self.sigma2), maxC)    #capped sinr
-        rate = self.W * np.log2(1. + sinr)
+        maxC = 1000.             #max rate
+        H2 = self.H2_set[:,:,self.count]            #current step H
+        p_extend = np.concatenate([P, np.zeros((1), dtype=dtype)], axis=0)       #concatenating a row of 0s
+        p_matrix = p_extend[self.p_array]             
+        path_main = H2[:,0] * p_matrix[:,0]         #main
+        path_inter = np.sum(H2[:,1:] * p_matrix[:,1:], axis=1)        #interference
+        sinr = np.minimum(path_main / (path_inter + self.sigma2), maxC)    #capped sinr (there is a max achievable data rate that we can get)
+        rate = self.W * np.log2(1. + sinr)   #formula
              
-        sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1])
+        sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1])    #normalization taking first col of H2
         sinr_norm_inv = np.log2(1. + sinr_norm_inv)   # log representation
         rate_extend = np.concatenate([rate, np.zeros((1), dtype=dtype)], axis=0)
         rate_matrix = rate_extend[self.p_array]
