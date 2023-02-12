@@ -93,7 +93,7 @@ def Test(sess, env, weight_file):
     print("Test average rate: %.3f" %(np.mean(reward_hist)))
     return reward_hist
     
-def Test_dqn_mem(weight_file, max_episode, Ns, fd, max_dis, maxM):
+def Test_dqn_mem(weight_file, max_episode, Ns, fd, max_dis, maxM):          #testing in memory limited scenario
     env = Env_cellular(fd, Ts, n_x, n_y, L, C, maxM, min_dis, max_dis, max_p, p_n, power_num)
     tf.reset_default_graph()
     with tf.Session() as sess:
@@ -137,7 +137,7 @@ def Test_dqn_all(weight_file, max_episode, Ns, fd, max_dis, maxM):
             reward_hist.append(np.mean(reward_dqn_list))   # bps/Hz per link
     return np.mean(reward_hist)
 
-def Test_dqn_time(weight_file, max_episode, Ns, fd, max_dis, maxM):
+def Test_dqn_time(weight_file, max_episode, Ns, fd, max_dis, maxM):          #to test prediction time
     env = Env_cellular(fd, Ts, n_x, n_y, L, C, maxM, min_dis, max_dis, max_p, p_n, power_num)
     tf.reset_default_graph()
     with tf.Session() as sess:
