@@ -46,15 +46,15 @@ power_num: number of power levels."""
         
         
         self.c = 3*self.L*(self.L+1) + 1 # adjascent BS
-        self.K = self.maxM * self.c # maximum adjascent users, including itself
+        self.K = self.maxM * self.c # maximum adjascent users, including itself, adj bs*maxm
 #        self.state_num = 2*self.C + 1    #  2*C + 1
-        self.state_num = 3*self.C + 2    #  C + 1
+        self.state_num = 3*self.C + 2    #  doubt
         self.N = self.n_x * self.n_y # BS number
         self.M = self.N * self.maxM # maximum users
         self.W = np.ones((self.M), dtype = dtype)         #[M] array of ones
         self.sigma2 = 1e-3*pow(10., self.p_n/10.)       #thermal noise power
         self.maxP = 1e-3*pow(10., self.max_p/10.)         #maxpower
-        self.p_array, self.p_list = self.generate_environment()
+        self.p_array, self.p_list = self.generate_environment()     
         
     def get_power_set(self, min_p):
         power_set = np.hstack([np.zeros((1), dtype=dtype), 1e-3*pow(10., np.linspace(min_p, self.max_p, self.power_num-1)/10.)])    #linear spacing of power
@@ -77,15 +77,15 @@ power_num: number of power levels."""
         return H2_set
         
     def generate_environment(self):
-        path_matrix = self.M*np.ones((self.n_y + 2*self.L, self.n_x + 2*self.L, self.maxM), dtype = np.int32)
-        for i in range(self.L, self.n_y+self.L):
-            for j in range(self.L, self.n_x+self.L):
+        path_matrix = self.M*np.ones((self.n_y + 2*self.L, self.n_x + 2*self.L, self.maxM), dtype = np.int32)  #extend our network to L on either side to accomodate the corner and side base stations.
+        for i in range(self.L, self.n_y+self.L):      #our range of work in y
+            for j in range(self.L, self.n_x+self.L):     #our range of our work in x
                 for l in range(self.maxM):
-                    path_matrix[i,j,l] = ((i-self.L)*self.n_x + (j-self.L))*self.maxM + l
-        p_array = np.zeros((self.M, self.K), dtype = np.int32)
+                    path_matrix[i,j,l] = ((i-self.L)*self.n_x + (j-self.L))*self.maxM + l   #numbering of base stations   
+        p_array = np.zeros((self.M, self.K), dtype = np.int32)    # every neighbouring user for a particular user
         for n in range(self.N):
-            i = n//self.n_x
-            j = n%self.n_x
+            i = n//self.n_x  #row number
+            j = n%self.n_x     #col number
             Jx = np.zeros((0), dtype = np.int32)
             Jy = np.zeros((0), dtype = np.int32)
             for u in range(i-self.L, i+self.L+1):
@@ -115,12 +115,12 @@ power_num: number of power levels."""
         return p_array, p_list
     
     def generate_path_loss(self):
-        p_tx = np.zeros((self.n_y, self.n_x))
+        p_tx = np.zeros((self.n_y, self.n_x))    #power transmitted by bs
         p_ty = np.zeros((self.n_y, self.n_x))
-        p_rx = np.zeros((self.n_y, self.n_x, self.maxM))
+        p_rx = np.zeros((self.n_y, self.n_x, self.maxM))   #power received by users
         p_ry = np.zeros((self.n_y, self.n_x, self.maxM))   
-        dis_rx = np.random.uniform(self.min_dis, self.max_dis, size = (self.n_y, self.n_x, self.maxM))
-        phi_rx = np.random.uniform(-np.pi, np.pi, size = (self.n_y, self.n_x, self.maxM))    
+        dis_rx = np.random.uniform(self.min_dis, self.max_dis, size = (self.n_y, self.n_x, self.maxM))       #storing distances between transmitter and user, initiated by taking uniform distribution between min and max dist
+        phi_rx = np.random.uniform(-np.pi, np.pi, size = (self.n_y, self.n_x, self.maxM))          #same as dist but with phase.
         for i in range(self.n_y):
             for j in range(self.n_x):
                 p_tx[i,j] = 2*self.max_dis*j + (i%2)*self.max_dis
