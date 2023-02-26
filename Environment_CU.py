@@ -81,7 +81,7 @@ power_num: number of power levels."""
         for i in range(self.L, self.n_y+self.L):      #our range of work in y
             for j in range(self.L, self.n_x+self.L):     #our range of our work in x
                 for l in range(self.maxM):
-                    path_matrix[i,j,l] = ((i-self.L)*self.n_x + (j-self.L))*self.maxM + l   #numbering of base stations   
+                    path_matrix[i,j,l] = ((i-self.L)*self.n_x + (j-self.L))*self.maxM + l   #numbering of all users  
         p_array = np.zeros((self.M, self.K), dtype = np.int32)    # every neighbouring user for a particular user
         for n in range(self.N):
             i = n//self.n_x  #row number
@@ -89,16 +89,16 @@ power_num: number of power levels."""
             Jx = np.zeros((0), dtype = np.int32)
             Jy = np.zeros((0), dtype = np.int32)
             for u in range(i-self.L, i+self.L+1):
-                v = 2*self.L+1-np.abs(u-i)
-                jx = j - (v-i%2)//2 + np.linspace(0, v-1, num = v, dtype = np.int32) + self.L
-                jy = np.ones((v), dtype = np.int32)*u + self.L
-                Jx = np.hstack((Jx, jx))
+                v = 2*self.L+1-np.abs(u-i)     #hexagonal pattern
+                jx = j - (v-i%2)//2 + np.linspace(0, v-1, num = v, dtype = np.int32) + self.L      # we are making the coordinates in row-wise sense so for x coordinates
+                jy = np.ones((v), dtype = np.int32)*u + self.L                                     # we will have to divide in equally spaced v numbers, for y coordinate
+                Jx = np.hstack((Jx, jx))    #storing coordinates                                   # it can be directlt obtained by taking ones array.
                 Jy = np.hstack((Jy, jy))
             for l in range(self.maxM):
                 for k in range(self.c):
                     for u in range(self.maxM):
-                        p_array[n*self.maxM+l,k*self.maxM+u] = path_matrix[Jy[k],Jx[k],u]
-        p_main = p_array[:,(self.c-1)//2*self.maxM:(self.c+1)//2*self.maxM]
+                        p_array[n*self.maxM+l,k*self.maxM+u] = path_matrix[Jy[k],Jx[k],u]       #user numbering in the hexagonal structure 
+        p_main = p_array[:,(self.c-1)//2*self.maxM:(self.c+1)//2*self.maxM]                     
         for n in range(self.N):
             for l in range(self.maxM):
                 temp = p_main[n*self.maxM+l,l]
