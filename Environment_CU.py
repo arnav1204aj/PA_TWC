@@ -148,13 +148,13 @@ power_num: number of power levels."""
         1.H2[t]   
         2.p[t]
         '''
-        maxC = 1000.             #max rate
-        H2 = self.H2_set[:,:,self.count]            #current step H
-        p_extend = np.concatenate([P, np.zeros((1), dtype=dtype)], axis=0)       #concatenating a row of 0s
-        p_matrix = p_extend[self.p_array]             
-        path_main = H2[:,0] * p_matrix[:,0]         #main
+        maxC = 1000.             #max sinr
+        H2 = self.H2_set[:,:,self.count]            #current step H (count)
+        p_extend = np.concatenate([P, np.zeros((1), dtype=dtype)], axis=0)       #concatenating a row of 0s (reference transmitter?)
+        p_matrix = p_extend[self.p_array]     #mapping powers to their transmitters            
+        path_main = H2[:,0] * p_matrix[:,0]         #gain channel of transmitter-receiver pair 
         path_inter = np.sum(H2[:,1:] * p_matrix[:,1:], axis=1)        #interference
-        sinr = np.minimum(path_main / (path_inter + self.sigma2), maxC)    #capped sinr (there is a max achievable data rate that we can get)
+        sinr = np.minimum(path_main / (path_inter + self.sigma2), maxC)    #comparison with max
         rate = self.W * np.log2(1. + sinr)   #formula
              
         sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1])    #normalization taking first col of H2
@@ -164,9 +164,9 @@ power_num: number of power levels."""
         '''
         Calculate reward, sum-rate
         '''
-        sum_rate = np.mean(rate)
-        reward_rate = rate + np.sum(rate_matrix, axis=1)
-        return p_matrix, rate_matrix, reward_rate, sum_rate
+        sum_rate = np.mean(rate)      #mean of rates without interference
+        reward_rate = rate + np.sum(rate_matrix, axis=1)   #including interfernce (rate_matrix)    
+        return p_matrix, rate_matrix, reward_rate, sum_rate   
         
     def generate_next_state(self, H2, p_matrix, rate_matrix):
         '''
