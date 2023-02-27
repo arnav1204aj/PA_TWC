@@ -157,9 +157,9 @@ power_num: number of power levels."""
         sinr = np.minimum(path_main / (path_inter + self.sigma2), maxC)    #comparison with max
         rate = self.W * np.log2(1. + sinr)   #formula
              
-        sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1])    #normalization taking first col of H2
+        sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1])    #first col has int + noise, which is repeated K-1 times and divided with H2.
         sinr_norm_inv = np.log2(1. + sinr_norm_inv)   # log representation
-        rate_extend = np.concatenate([rate, np.zeros((1), dtype=dtype)], axis=0)
+        rate_extend = np.concatenate([rate, np.zeros((1), dtype=dtype)], axis=0) 
         rate_matrix = rate_extend[self.p_array]
         '''
         Calculate reward, sum-rate
@@ -177,11 +177,11 @@ power_num: number of power levels."""
         2.p[t]         [M,C+1]  p_matrix
         3.C[t]         [M,C+1]  rate_matrix  optional
         '''
-        sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1])
+        sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1]) #first col has int + noise, which is repeated K-1 times and divided with H2.
         sinr_norm_inv = np.log2(1. + sinr_norm_inv)   # log representation
-        indices1 = np.tile(np.expand_dims(np.linspace(0, p_matrix.shape[0]-1, num=p_matrix.shape[0], dtype=np.int32), axis=1),[1,self.C])
-        indices2 = np.argsort(sinr_norm_inv, axis = 1)[:,-self.C:]
-        sinr_norm_inv = sinr_norm_inv[indices1, indices2]
+        indices1 = np.tile(np.expand_dims(np.linspace(0, p_matrix.shape[0]-1, num=p_matrix.shape[0], dtype=np.int32), axis=1),[1,self.C])  #quantisation of power, selecting first C
+        indices2 = np.argsort(sinr_norm_inv, axis = 1)[:,-self.C:]    #Selecting first C SINR 
+        sinr_norm_inv = sinr_norm_inv[indices1, indices2]       
         p_last = np.hstack([p_matrix[:,0:1], p_matrix[indices1, indices2+1]])
         rate_last = np.hstack([rate_matrix[:,0:1], rate_matrix[indices1, indices2+1]])
 
