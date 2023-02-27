@@ -17,8 +17,8 @@ class DNN:
         self.power_set = env.get_power_set(self.min_p)
         self.M = env.M
         self.max_episode = max_episode
-        self.weight_file = weight_file
-        self.INITIAL_EPSILON = INITIAL_EPSILON
+        self.weight_file = weight_file           
+        self.INITIAL_EPSILON = INITIAL_EPSILON   #exploration/exploitation
         self.FINAL_EPSILON = FINAL_EPSILON
 
         self.s = tf.placeholder(tf.float32, [None, self.state_num], name ='s')   #placeholder for state
