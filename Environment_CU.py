@@ -186,7 +186,7 @@ power_num: number of power levels."""
         rate_last = np.hstack([rate_matrix[:,0:1], rate_matrix[indices1, indices2+1]])
 
 #        s_actor_next = np.hstack([sinr_norm_inv, p_last])
-        s_actor_next = np.hstack([sinr_norm_inv, p_last, rate_last])
+        s_actor_next = np.hstack([sinr_norm_inv, p_last, rate_last])   # for next iteration
         '''
         Generate state for critic
         '''
@@ -203,7 +203,7 @@ power_num: number of power levels."""
         s_actor, s_critic = self.generate_next_state(H2, p_matrix, rate_matrix)
         return s_actor, s_critic
         
-    def step(self, P):
+    def step(self, P):     #transition to next step
         p_matrix, rate_matrix, reward_rate, sum_rate = self.calculate_rate(P)
         self.count = self.count + 1
         H2_next = self.H2_set[:,:,self.count]
