@@ -72,13 +72,13 @@ class DNN:
         b = tf.get_variable('b', shape = shape, initializer = tf.constant_initializer(initial))    
         return b
         
-    def create_dqn(self, s, name):
+    def create_dqn(self, s, name):           #neural network creation
         with tf.variable_scope(name + '.0', reuse = reuse):
-            w = self.variable_w([self.state_num, 128])
+            w = self.variable_w([self.state_num, 128])        #input number for this w = state.num
             b = self.variable_b([128])
             l = tf.nn.relu(tf.matmul(s, w)+b)
         with tf.variable_scope(name + '.1', reuse = reuse):
-            w = self.variable_w([128, 64])
+            w = self.variable_w([128, 64])             
             b = self.variable_b([64])
             l = tf.nn.relu(tf.matmul(l, w) + b)
         with tf.variable_scope(name + '.2', reuse = reuse):
@@ -129,12 +129,12 @@ class DQN:
         self.s = dnn.get_dqn_in(is_target=False)
         self.a = dnn.get_action(is_target=False)
         self.q_hat = dnn.get_dqn_out(is_target=False)
-        self.a_hat = tf.argmax(self.q_hat, 1)
+        self.a_hat = tf.argmax(self.q_hat, 1)        #action with highest q value
         self.params = dnn.get_dqn_params(is_target=False)
         self.load = dnn.load_dqn_params
 
-        self.r = tf.reduce_sum(tf.multiply(self.q_hat, self.a), reduction_indices = 1)
-        self.loss = tf.nn.l2_loss(self.y - self.r)
+        self.r = tf.reduce_sum(tf.multiply(self.q_hat, self.a), reduction_indices = 1)      #getting r from q and action
+        self.loss = tf.nn.l2_loss(self.y - self.r)          #loss
         with tf.variable_scope('opt_dqn', reuse = reuse):
             self.optimize = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss, var_list = self.params)
 
