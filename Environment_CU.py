@@ -67,13 +67,13 @@ power_num: number of power levels."""
         '''
         Jakes model
         '''
-        H_set = np.zeros([self.M,self.K,self.Ns], dtype=dtype)    #initialize as 0
+        H_set = np.zeros([self.M,self.K,self.Ns], dtype=dtype)    #initialize as 0, value of H for a user and all its neighbouring users which can cause interference
         pho = np.float32(scipy.special.k0(2*np.pi*self.fd*self.Ts))   #bessel function
-        H_set[:,:,0] = np.kron(np.sqrt(0.5*(np.random.randn(self.M, self.c)**2+np.random.randn(self.M, self.c)**2)), np.ones((1,self.maxM), dtype=np.int32))
+        H_set[:,:,0] = np.kron(np.sqrt(0.5*(np.random.randn(self.M, self.c)**2+np.random.randn(self.M, self.c)**2)), np.ones((1,self.maxM), dtype=np.int32))  #set for Ns=0
         for i in range(1,self.Ns):
-            H_set[:,:,i] = H_set[:,:,i-1]*pho + np.sqrt((1.-pho**2)*0.5*(np.random.randn(self.M, self.K)**2+np.random.randn(self.M, self.K)**2))
+            H_set[:,:,i] = H_set[:,:,i-1]*pho + np.sqrt((1.-pho**2)*0.5*(np.random.randn(self.M, self.K)**2+np.random.randn(self.M, self.K)**2))    #for subsequent Ns pho is bessel func
         path_loss = self.generate_path_loss()
-        H2_set = np.square(H_set) * np.tile(np.expand_dims(path_loss, axis=2), [1,1,self.Ns])   
+        H2_set = np.square(H_set) * np.tile(np.expand_dims(path_loss, axis=2), [1,1,self.Ns]) #h2 formed by multiplying path loss with H  
         return H2_set
         
     def generate_environment(self):
