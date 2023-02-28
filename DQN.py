@@ -12,12 +12,12 @@ reuse=tf.AUTO_REUSE
 class DNN:
     def __init__(self, env, weight_file, max_episode = 5000, INITIAL_EPSILON = 0.2, FINAL_EPSILON = 0.0001):
         self.state_num = env.state_num
-        self.action_num = env.power_num
-        self.min_p = 5 #dBm
-        self.power_set = env.get_power_set(self.min_p)
-        self.M = env.M
-        self.max_episode = max_episode
-        self.weight_file = weight_file           
+        self.action_num = env.power_num          #power levels
+        self.min_p = 5 #dBm          
+        self.power_set = env.get_power_set(self.min_p)          
+        self.M = env.M   #number of samples
+        self.max_episode = max_episode    #num of episodes
+        self.weight_file = weight_file    #weights       
         self.INITIAL_EPSILON = INITIAL_EPSILON   #exploration/exploitation
         self.FINAL_EPSILON = FINAL_EPSILON
 
@@ -157,13 +157,13 @@ class DQN:
 
     def select_action(self, a_hat, episode):
         epsilon = self.INITIAL_EPSILON - episode * (self.INITIAL_EPSILON - self.FINAL_EPSILON) / self.max_episode            #epsilon greedy
-        random_index = np.array(np.random.uniform(size = (self.M)) < epsilon, dtype = np.int32)
-        random_action = np.random.randint(0, high = self.action_num, size = (self.M))
-        action_set = np.vstack([a_hat, random_action])
-        power_index = action_set[random_index, range(self.M)] #[M]
-        p = self.power_set[power_index] # W
-        a = np.zeros((self.M, self.action_num), dtype = np.float32)
-        a[range(self.M), power_index] = 1.
+        random_index = np.array(np.random.uniform(size = (self.M)) < epsilon, dtype = np.int32)     #binary array with epsilon probability of 1
+        random_action = np.random.randint(0, high = self.action_num, size = (self.M))            #choosing random action, M random powers for M users
+        action_set = np.vstack([a_hat, random_action])         #ahat is storing max action for each state.
+        power_index = action_set[random_index, range(self.M)] #if ith element of random_index=1 then power_index will be random power else max
+        p = self.power_set[power_index] #contains powers for all users in ith action.
+        a = np.zeros((self.M, self.action_num), dtype = np.float32)  
+        a[range(self.M), power_index] = 1.        
         return p, a
 
     
