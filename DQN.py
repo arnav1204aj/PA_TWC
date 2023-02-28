@@ -89,8 +89,8 @@ class DNN:
         
     def save_params(self):
         dict_name={}
-        for var in tf.trainable_variables(): 
-            dict_name[var.name]=var.eval()
+        for var in tf.trainable_variables():  #from the neural network
+            dict_name[var.name]=var.eval()     #dict with variable name and its value
         scipy.io.savemat(self.weight_file, dict_name)
 
         
