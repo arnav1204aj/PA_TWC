@@ -31,7 +31,7 @@ def Train(sess, env, weight_file):
     max_reward = 0
     batch_size = 500
     max_episode = 5000
-    buffer_size = 50000
+    buffer_size = 50000 
     Ns = 11
     env.set_Ns(Ns)  
     dnn = DNN(env, weight_file, max_episode = max_episode)
