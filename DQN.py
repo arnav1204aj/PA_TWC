@@ -23,9 +23,9 @@ class DNN:
 
         self.s = tf.placeholder(tf.float32, [None, self.state_num], name ='s')   #placeholder for state
         self.a = tf.placeholder(tf.float32, [None, self.action_num], name ='a')     #placeholder for action
-        self.dqn = self.create_dqn(self.s, 'dqn')
-        self.dqn_params = self.get_params('dqn')
-        self.load_dqn_params = self.load_params('dqn')
+        self.dqn = self.create_dqn(self.s, 'dqn')  #neural network
+        self.dqn_params = self.get_params('dqn')    #gets parameters for dqn
+        self.load_dqn_params = self.load_params('dqn')   
         
         self.s_target = tf.placeholder(tf.float32, [None, self.state_num], name ='s_target')
         self.dqn_target = self.create_dqn(self.s_target, 'dqn_tar')
@@ -37,19 +37,19 @@ class DNN:
         if is_target:
             return self.s_target
         else:
-            return self.s
+            return self.s      #return state placeholder
             
     def get_action(self, is_target=False):
         if is_target:
             return self.a_target
         else:
-            return self.a
+            return self.a     #returns action placeholder
             
     def get_dqn_out(self, is_target=False):
         if is_target:
-            return self.dqn_target
+            return self.dqn_target      
         else:
-            return self.dqn
+            return self.dqn       
         
     def get_dqn_params(self, is_target=False):
         if is_target:
@@ -102,12 +102,12 @@ class DNN:
                 var_list = self.dqn_params
         try:
 
-            theta = scipy.io.loadmat(self.weight_file)
+            theta = scipy.io.loadmat(self.weight_file)       #load the saved parameters file
             update=[]
             for var in var_list:
 #                print(var.name, var.shape)
                 print(theta[var.name].shape)
-                update.append(tf.assign(tf.get_default_graph().get_tensor_by_name(var.name),tf.constant(np.reshape(theta[var.name],var.shape))))
+                update.append(tf.assign(tf.get_default_graph().get_tensor_by_name(var.name),tf.constant(np.reshape(theta[var.name],var.shape))))  #updating tensor with new values
         except:
             print('fail dqn')
             update=[]
