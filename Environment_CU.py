@@ -77,12 +77,12 @@ power_num: number of power levels.   10"""
         return H2_set
         
     def generate_environment(self):
-        path_matrix = self.M*np.ones((self.n_y + 2*self.L, self.n_x + 2*self.L, self.maxM), dtype = np.int32)  #extend our network to L on either side to accomodate the corner and side base stations.
+        path_matrix = self.M*np.ones((self.n_y + 2*self.L, self.n_x + 2*self.L, self.maxM), dtype = np.int32)  #extend our network to L on either side to accomodate the corner and side base stations. [9,9,4]
         for i in range(self.L, self.n_y+self.L):      #our range of work in y
             for j in range(self.L, self.n_x+self.L):     #our range of our work in x
                 for l in range(self.maxM):
-                    path_matrix[i,j,l] = ((i-self.L)*self.n_x + (j-self.L))*self.maxM + l   #numbering of all users  
-        p_array = np.zeros((self.M, self.K), dtype = np.int32)    # every neighbouring user for a particular user
+                    path_matrix[i,j,l] = ((i-self.L)*self.n_x + (j-self.L))*self.maxM + l   #numbering of all users, taking all users of all previous rows, then of the current row.  
+        p_array = np.zeros((self.M, self.K), dtype = np.int32)    # every neighbouring user for a particular user [100,76]
         for n in range(self.N):
             i = n//self.n_x  #row number
             j = n%self.n_x     #col number
@@ -92,12 +92,12 @@ power_num: number of power levels.   10"""
                 v = 2*self.L+1-np.abs(u-i)     #hexagonal pattern
                 jx = j - (v-i%2)//2 + np.linspace(0, v-1, num = v, dtype = np.int32) + self.L      # we are making the coordinates in row-wise sense so for x coordinates
                 jy = np.ones((v), dtype = np.int32)*u + self.L                                     # we will have to divide in equally spaced v numbers, for y coordinate
-                Jx = np.hstack((Jx, jx))    #storing coordinates                                   # it can be directlt obtained by taking ones array.
+                Jx = np.hstack((Jx, jx))    #storing coordinates                                   # it can be directlt obtained by taking ones array as it will remain same for a row
                 Jy = np.hstack((Jy, jy))
             for l in range(self.maxM):
                 for k in range(self.c):
                     for u in range(self.maxM):
-                        p_array[n*self.maxM+l,k*self.maxM+u] = path_matrix[Jy[k],Jx[k],u]       #user numbering in the hexagonal structure 
+                        p_array[n*self.maxM+l,k*self.maxM+u] = path_matrix[Jy[k],Jx[k],u]       #distance between any two users, vertical dist, horizontal dist 
         p_main = p_array[:,(self.c-1)//2*self.maxM:(self.c+1)//2*self.maxM]                     
         for n in range(self.N):
             for l in range(self.maxM):
@@ -126,10 +126,10 @@ power_num: number of power levels.   10"""
                 p_tx[i,j] = 2*self.max_dis*j + (i%2)*self.max_dis
                 p_ty[i,j] = np.sqrt(3.)*self.max_dis*i
                 for k in range(self.maxM):  
-                    p_rx[i,j,k] = p_tx[i,j] + dis_rx[i,j,k]*np.cos(phi_rx[i,j,k])
-                    p_ry[i,j,k] = p_ty[i,j] + dis_rx[i,j,k]*np.sin(phi_rx[i,j,k])
-        dis = 1e10 * np.ones((self.p_array.shape[0], self.K), dtype = dtype)
-        lognormal = np.random.lognormal(size = (self.p_array.shape[0], self.K), sigma = 8)
+                    p_rx[i,j,k] = p_tx[i,j] + dis_rx[i,j,k]*np.cos(phi_rx[i,j,k])    #reach the transmitter and then reach the user (x)
+                    p_ry[i,j,k] = p_ty[i,j] + dis_rx[i,j,k]*np.sin(phi_rx[i,j,k])    #reach the transmitter and then reach the user (y)
+        dis = 1e10 * np.ones((self.p_array.shape[0], self.K), dtype = dtype)  # user and its neighbours [101,76]
+        lognormal = np.random.lognormal(size = (self.p_array.shape[0], self.K), sigma = 8)  # dist of X such that logX follows a normal distribution, sigma is the width of the dist. it accounts for obstacles in the environment. 
         for k in range(self.p_array.shape[0]):
             for i in range(self.c):
                 for j in range(self.maxM):
