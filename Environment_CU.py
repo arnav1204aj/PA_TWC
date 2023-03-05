@@ -30,29 +30,29 @@ class Env_cellular():
         self.max_p = max_p #dBm
         self.p_n = p_n     #dBm
         self.power_num = power_num
-        """fd: a frequency parameter.
-Ts: a time slot parameter.
-n_x: number of cells in x-direction.
-n_y: number of cells in y-direction.
-L: number of cells per BS in one direction.
-C: number of channels.
-maxM: maximum number of users that can be served by one BS.
-min_dis: minimum distance between users and BSs.
-max_dis: maximum distance between users and BSs.
-max_p: maximum power of BSs in dBm.
-p_n: thermal noise power in dBm.
-power_num: number of power levels."""
+        """fd: a frequency parameter.  10
+Ts: a time slot parameter.   20e-3
+n_x: number of cells in x-direction.   5
+n_y: number of cells in y-direction.  5
+L: number of cells per BS in one direction.  2
+C: number of channels.   16   (Ic, number after which we start neglecting stuff)
+maxM: maximum number of users that can be served by one BS.      4
+min_dis: minimum distance between users and BSs.    0.01km
+max_dis: maximum distance between users and BSs.        1km
+max_p: maximum power of BSs in dBm.      38
+p_n: thermal noise power in dBm.    -114
+power_num: number of power levels.   10"""
         
         
         
-        self.c = 3*self.L*(self.L+1) + 1 # adjascent BS
-        self.K = self.maxM * self.c # maximum adjascent users, including itself, adj bs*maxm
-#        self.state_num = 2*self.C + 1    #  2*C + 1
-        self.state_num = 3*self.C + 2    #  doubt
-        self.N = self.n_x * self.n_y # BS number
-        self.M = self.N * self.maxM # maximum users
-        self.W = np.ones((self.M), dtype = dtype)         #[M] array of ones
-        self.sigma2 = 1e-3*pow(10., self.p_n/10.)       #thermal noise power
+        self.c = 3*self.L*(self.L+1) + 1 # adjascent BS (19)      
+        self.K = self.maxM * self.c # maximum adjascent users, including itself, adj bs*maxm (76)
+#        self.state_num = 2*self.C + 1    #  2*C + 1 
+        self.state_num = 3*self.C + 2    #  doubt (50)
+        self.N = self.n_x * self.n_y # BS number (25)
+        self.M = self.N * self.maxM # maximum users (100)
+        self.W = np.ones((self.M), dtype = dtype)         #[100] array of ones
+        self.sigma2 = 1e-3*pow(10., self.p_n/10.)       #thermal noise power 
         self.maxP = 1e-3*pow(10., self.max_p/10.)         #maxpower
         self.p_array, self.p_list = self.generate_environment()     
         
@@ -61,19 +61,19 @@ power_num: number of power levels."""
         return power_set
         
     def set_Ns(self, Ns):
-        self.Ns = int(Ns)   #number of steps in each episode
+        self.Ns = int(Ns)   #number of steps in each episode (11)
         
     def generate_H_set(self):
         '''
         Jakes model
         '''
-        H_set = np.zeros([self.M,self.K,self.Ns], dtype=dtype)    #initialize as 0, value of H for a user and all its neighbouring users which can cause interference
+        H_set = np.zeros([self.M,self.K,self.Ns], dtype=dtype)    #initialize as 0, value of H for a user and all its neighbouring users which can cause interference [100,76,11]
         pho = np.float32(scipy.special.k0(2*np.pi*self.fd*self.Ts))   #bessel function
-        H_set[:,:,0] = np.kron(np.sqrt(0.5*(np.random.randn(self.M, self.c)**2+np.random.randn(self.M, self.c)**2)), np.ones((1,self.maxM), dtype=np.int32))  #set for Ns=0
+        H_set[:,:,0] = np.kron(np.sqrt(0.5*(np.random.randn(self.M, self.c)**2+np.random.randn(self.M, self.c)**2)), np.ones((1,self.maxM), dtype=np.int32))  #set for Ns=0,kron=kron. product, generates a 2D array of the same size as in step 1, but with each element replaced by the square of the sum of two independent standard normal random variables and takes their sq root and then kron with ones array. (paper defines H initially like as a complex gaussian rv so a2 + b2 form)
         for i in range(1,self.Ns):
-            H_set[:,:,i] = H_set[:,:,i-1]*pho + np.sqrt((1.-pho**2)*0.5*(np.random.randn(self.M, self.K)**2+np.random.randn(self.M, self.K)**2))    #for subsequent Ns pho is bessel func
+            H_set[:,:,i] = H_set[:,:,i-1]*pho + np.sqrt((1.-pho**2)*0.5*(np.random.randn(self.M, self.K)**2+np.random.randn(self.M, self.K)**2))    #for subsequent Ns pho is bessel func, bessel func to previous H set then add N which is also a complex normal distribution with mean 0 and var 1-p2.
         path_loss = self.generate_path_loss()
-        H2_set = np.square(H_set) * np.tile(np.expand_dims(path_loss, axis=2), [1,1,self.Ns]) #h2 formed by multiplying path loss with H  
+        H2_set = np.square(H_set) * np.tile(np.expand_dims(path_loss, axis=2), [1,1,self.Ns]) #h2 formed by multiplying path loss with H, expand dims adds a new dim to path loss [100,76,1]. tile func repeats the values 11 times [100,76,11].  
         return H2_set
         
     def generate_environment(self):
