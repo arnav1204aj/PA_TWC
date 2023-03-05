@@ -130,16 +130,16 @@ power_num: number of power levels.   10"""
                     p_ry[i,j,k] = p_ty[i,j] + dis_rx[i,j,k]*np.sin(phi_rx[i,j,k])    #reach the transmitter and then reach the user (y)
         dis = 1e10 * np.ones((self.p_array.shape[0], self.K), dtype = dtype)  # user and its neighbours [101,76]
         lognormal = np.random.lognormal(size = (self.p_array.shape[0], self.K), sigma = 8)  # dist of X such that logX follows a normal distribution, sigma is the width of the dist. it accounts for obstacles in the environment. 
-        for k in range(self.p_array.shape[0]):
-            for i in range(self.c):
-                for j in range(self.maxM):
-                    if self.p_array[k,i*self.maxM+j] < self.M:
-                        bs = self.p_array[k,i*self.maxM+j]//self.maxM
-                        dx2 = np.square((p_rx[k//self.maxM//self.n_x][k//self.maxM%self.n_x][k%self.maxM]-p_tx[bs//self.n_x][bs%self.n_x]))
-                        dy2 = np.square((p_ry[k//self.maxM//self.n_x][k//self.maxM%self.n_x][k%self.maxM]-p_ty[bs//self.n_x][bs%self.n_x]))
+        for k in range(self.p_array.shape[0]):  #choosing user
+            for i in range(self.c): #choosing nbour bs
+                for j in range(self.maxM):   #choosing nbour user
+                    if self.p_array[k,i*self.maxM+j] < self.M:   #lt 100 
+                        bs = self.p_array[k,i*self.maxM+j]//self.maxM #bs of nbour user   
+                        dx2 = np.square((p_rx[k//self.maxM//self.n_x][k//self.maxM%self.n_x][k%self.maxM]-p_tx[bs//self.n_x][bs%self.n_x])) #x dist bw user and nbour 
+                        dy2 = np.square((p_ry[k//self.maxM//self.n_x][k//self.maxM%self.n_x][k%self.maxM]-p_ty[bs//self.n_x][bs%self.n_x]))   #y dist
                         distance = np.sqrt(dx2 + dy2)
-                        dis[k,i*self.maxM+j] = distance
-        path_loss = lognormal*pow(10., -(120.9 + 37.6*np.log10(dis))/10.)
+                        dis[k,i*self.maxM+j] = distance   #doubt (dist bw user and nbour bs = dist bw user and nbour user?)
+        path_loss = lognormal*pow(10., -(120.9 + 37.6*np.log10(dis))/10.)  #path loss formula
         return path_loss
         
     def calculate_rate(self, P):
