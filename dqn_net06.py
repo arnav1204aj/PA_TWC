@@ -42,18 +42,18 @@ def Train(sess, env, weight_file):
     interval = 100
     st = time.time()
     reward_hist = list()                              #reward of each episode
-    for k in range(1, max_episode+1):  
+    for k in range(1, max_episode+1):   #1 to 5001
         reward_dqn_list = list()                        # reward of each step
-        s_actor, _ = env.reset()
+        s_actor, _ = env.reset()      #reset for every episode
         for i in range(int(Ns)-1):
             a = dqn.predict_a(s_actor)                  #max reward action
             p, a = dqn.select_action(a, k)               #exploration/exploitation
-            s_actor_next, _, rate, r = env.step(p)       #reward
+            s_actor_next, _, rate, r = env.step(p)       #next step
             deque.add(s_actor, a, rate)                  #addition to replay buffer
-            s_actor = s_actor_next
+            s_actor = s_actor_next     
             reward_dqn_list.append(r)
         if deque.size() > batch_size:                 #size>batchsize then train using data sampled till now
-            batch_s, batch_a, batch_r = deque.sample_batch(batch_size)
+            batch_s, batch_a, batch_r = deque.sample_batch(batch_size)   #see this
             dqn.train(batch_s, batch_a, batch_r)
             
         reward_hist.append(np.mean(reward_dqn_list))   # mean reward of one episode
