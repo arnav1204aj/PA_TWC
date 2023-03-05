@@ -193,14 +193,14 @@ power_num: number of power levels.   10"""
         s_critic_next = H2
         return s_actor_next, s_critic_next
         
-    def reset(self):
+    def reset(self):   #reset
         self.count = 0
-        self.H2_set = self.generate_H_set()
-        P = np.zeros([self.M], dtype=dtype)
+        self.H2_set = self.generate_H_set()   #generate again
+        P = np.zeros([self.M], dtype=dtype)       
         
         p_matrix, rate_matrix, _, _ = self.calculate_rate(P)
         H2 = self.H2_set[:,:,self.count]
-        s_actor, s_critic = self.generate_next_state(H2, p_matrix, rate_matrix)
+        s_actor, s_critic = self.generate_next_state(H2, p_matrix, rate_matrix)       #get all initial conditions
         return s_actor, s_critic
         
     def step(self, P):     #transition to next step
