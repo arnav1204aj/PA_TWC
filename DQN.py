@@ -11,23 +11,23 @@ reuse=tf.AUTO_REUSE
    
 class DNN:
     def __init__(self, env, weight_file, max_episode = 5000, INITIAL_EPSILON = 0.2, FINAL_EPSILON = 0.0001):
-        self.state_num = env.state_num
-        self.action_num = env.power_num          #power levels
+        self.state_num = env.state_num   #numb of features (50) (refer paper)
+        self.action_num = env.power_num          #power levels  (10)
         self.min_p = 5 #dBm          
-        self.power_set = env.get_power_set(self.min_p)          
+        self.power_set = env.get_power_set(self.min_p)     #quantisation      
         self.M = env.M   #number of samples
         self.max_episode = max_episode    #num of episodes
         self.weight_file = weight_file    #weights       
         self.INITIAL_EPSILON = INITIAL_EPSILON   #exploration/exploitation
         self.FINAL_EPSILON = FINAL_EPSILON
 
-        self.s = tf.placeholder(tf.float32, [None, self.state_num], name ='s')   #placeholder for state
-        self.a = tf.placeholder(tf.float32, [None, self.action_num], name ='a')     #placeholder for action
+        self.s = tf.placeholder(tf.float32, [None, self.state_num], name ='s')   #placeholder for state  shape=[500,50]   none is for batch size  (for input state)
+        self.a = tf.placeholder(tf.float32, [None, self.action_num], name ='a')     #placeholder for action shape = [500,10]
         self.dqn = self.create_dqn(self.s, 'dqn')  #neural network
         self.dqn_params = self.get_params('dqn')    #gets parameters for dqn
         self.load_dqn_params = self.load_params('dqn')   
         
-        self.s_target = tf.placeholder(tf.float32, [None, self.state_num], name ='s_target')
+        self.s_target = tf.placeholder(tf.float32, [None, self.state_num], name ='s_target')   #for target state (fixed for us) (our use?)
         self.dqn_target = self.create_dqn(self.s_target, 'dqn_tar')
         self.dqn_target_params = self.get_params('dqn_tar')
         self.load_dqn_target_params = self.load_params('dqn', True)
@@ -65,11 +65,11 @@ class DNN:
         return sets
         
     def variable_w(self, shape, name = 'w'):
-        w = tf.get_variable(name, shape = shape, initializer = tf.truncated_normal_initializer(stddev=0.1))
+        w = tf.get_variable(name, shape = shape, initializer = tf.truncated_normal_initializer(stddev=0.1))     #truncated normal dist, cut from either sides
         return w
         
     def variable_b(self, shape, initial = 0.01):
-        b = tf.get_variable('b', shape = shape, initializer = tf.constant_initializer(initial))    
+        b = tf.get_variable('b', shape = shape, initializer = tf.constant_initializer(initial))     #constant value  
         return b
         
     def create_dqn(self, s, name):           #neural network creation
