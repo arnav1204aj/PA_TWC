@@ -156,8 +156,8 @@ class DQN:
         return self.sess.run(self.load)
 
     def select_action(self, a_hat, episode):
-        epsilon = self.INITIAL_EPSILON - episode * (self.INITIAL_EPSILON - self.FINAL_EPSILON) / self.max_episode            #epsilon greedy
-        random_index = np.array(np.random.uniform(size = (self.M)) < epsilon, dtype = np.int32)     #binary array with epsilon probability of 1
+        epsilon = self.INITIAL_EPSILON - episode * (self.INITIAL_EPSILON - self.FINAL_EPSILON) / self.max_episode            # epsilon value dec uniformly
+        random_index = np.array(np.random.uniform(size = (self.M)) < epsilon, dtype = np.int32)     #binary array with epsilon probability of 1 and 1-epsilon for 0 (uniform dist bw 0 and 1 so prob of less than epsilon is epsilon)
         random_action = np.random.randint(0, high = self.action_num, size = (self.M))            #choosing random action, M random powers for M users
         action_set = np.vstack([a_hat, random_action])         #ahat is storing max action for each state.
         power_index = action_set[random_index, range(self.M)] #if ith element of random_index=1 then power_index will be random power else max
