@@ -158,12 +158,12 @@ class DQN:
     def select_action(self, a_hat, episode):
         epsilon = self.INITIAL_EPSILON - episode * (self.INITIAL_EPSILON - self.FINAL_EPSILON) / self.max_episode            # epsilon value dec uniformly
         random_index = np.array(np.random.uniform(size = (self.M)) < epsilon, dtype = np.int32)     #binary array with epsilon probability of 1 and 1-epsilon for 0 (uniform dist bw 0 and 1 so prob of less than epsilon is epsilon)
-        random_action = np.random.randint(0, high = self.action_num, size = (self.M))            #choosing random action, M random powers for M users
-        action_set = np.vstack([a_hat, random_action])         #ahat is storing max action for each state.
-        power_index = action_set[random_index, range(self.M)] #if ith element of random_index=1 then power_index will be random power else max
+        random_action = np.random.randint(0, high = self.action_num, size = (self.M))            #choosing random action, M random powers for M users from action_num levels.
+        action_set = np.vstack([a_hat, random_action])         #ahat is storing max action for each user, random_action has random action for each user.
+        power_index = action_set[random_index, range(self.M)] #if ith element of random_index=1 then power_index will be random power else max (0 pe ahat is set and 1 pe random is set)
         p = self.power_set[power_index] #contains powers for all users in ith action.
-        a = np.zeros((self.M, self.action_num), dtype = np.float32)  
-        a[range(self.M), power_index] = 1.        
+        a = np.zeros((self.M, self.action_num), dtype = np.float32)  #[100,10], all set to 0
+        a[range(self.M), power_index] = 1.        #chosen user-power pairs set to 1.
         return p, a
 
     
