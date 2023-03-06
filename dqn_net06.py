@@ -60,12 +60,12 @@ def Train(sess, env, weight_file):
         if k % interval == 0: 
             reward = np.mean(reward_hist[-interval:])  #mean of reward of k episodes taken every k intervals
             if reward > max_reward:
-                dnn.save_params()
+                dnn.save_params()  
                 max_reward = reward
             print("Episode(train):%d  DQN: %.3f  Time cost: %.2fs" 
                   %(k, reward, time.time()-st))
             st = time.time()
-    return reward_hist
+    return reward_hist   
     
 def Test(sess, env, weight_file):
     max_episode = 100
@@ -184,24 +184,24 @@ def Train_dqn_mem(weight_file, fd, max_dis, maxM):
     env = Env_cellular(fd, Ts, n_x, n_y, L, C, maxM, min_dis, max_dis, max_p, p_n, power_num)
     tf.reset_default_graph()
     with tf.Session() as sess:
-        Train(sess, env, weight_file)
+        Train(sess, env, weight_file)           
         
 def Train_dqn_mem_quan(weight_file, power_num, fd, max_dis, maxM):
     env = Env_cellular(fd, Ts, n_x, n_y, L, C, maxM, min_dis, max_dis, max_p, p_n, power_num)
     tf.reset_default_graph()
     with tf.Session() as sess:
-        Train(sess, env, weight_file)
+        Train(sess, env, weight_file)         
         
 if __name__ == "__main__":
     env = Env_cellular(fd, Ts, n_x, n_y, L, C, maxM, min_dis, max_dis, max_p, p_n, power_num)
     weight_file = 'C:/Software/workshop/python/dqn_6.mat'
     tf.reset_default_graph()
     with tf.Session() as sess:
-        train_hist = Train(sess, env, weight_file)
+        train_hist = Train(sess, env, weight_file)       
         
-    tf.reset_default_graph()
+    tf.reset_default_graph()             
     with tf.Session() as sess:
-        test_hist = Test(sess, env, weight_file)
+        test_hist = Test(sess, env, weight_file)        
             
             
             
