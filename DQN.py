@@ -49,20 +49,20 @@ class DNN:
         if is_target:
             return self.dqn_target      
         else:
-            return self.dqn       
+            return self.dqn      #returns created neural network      
         
     def get_dqn_params(self, is_target=False):
         if is_target:
             return self.dqn_target_params
         else:
-            return self.dqn_params
+            return self.dqn_params    
         
     def get_params(self, para_name):
         sets=[]
-        for var in tf.trainable_variables():
-            if not var.name.find(para_name):
+        for var in tf.trainable_variables():   #w and b
+            if not var.name.find(para_name):   #this return true if paraname is present in var name. here paraname is dqn and we create dqn variables with name dqn + numb later in the neural network hence it will return true for w and b in neural networks.
                 sets.append(var)
-        return sets
+        return sets   
         
     def variable_w(self, shape, name = 'w'):
         w = tf.get_variable(name, shape = shape, initializer = tf.truncated_normal_initializer(stddev=0.1))     #truncated normal dist, cut from either sides
@@ -73,7 +73,7 @@ class DNN:
         return b
         
     def create_dqn(self, s, name):           #neural network creation
-        with tf.variable_scope(name + '.0', reuse = reuse):
+        with tf.variable_scope(name + '.0', reuse = reuse):   #here we name all variables as 'dqn' + and numb.
             w = self.variable_w([self.state_num, 128])        #input number for this w = state.num
             b = self.variable_b([128])
             l = tf.nn.relu(tf.matmul(s, w)+b)
@@ -91,7 +91,7 @@ class DNN:
         dict_name={}
         for var in tf.trainable_variables():  #from the neural network
             dict_name[var.name]=var.eval()     #dict with variable name and its value
-        scipy.io.savemat(self.weight_file, dict_name)
+        scipy.io.savemat(self.weight_file, dict_name)  
 
         
     def load_params(self, name, is_target = False):
