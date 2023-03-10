@@ -98,7 +98,7 @@ power_num: number of power levels.   10"""
                 for k in range(self.c):
                     for u in range(self.maxM):
                         p_array[n*self.maxM+l,k*self.maxM+u] = path_matrix[Jy[k],Jx[k],u]       #relative user number of a neighbour from a user. 
-        p_main = p_array[:,(self.c-1)//2*self.maxM:(self.c+1)//2*self.maxM]                     
+        p_main = p_array[:,(self.c-1)//2*self.maxM:(self.c+1)//2*self.maxM]                  #p_main = [100,4]                 
         for n in range(self.N):
             for l in range(self.maxM):
                 temp = p_main[n*self.maxM+l,l]
@@ -152,8 +152,8 @@ power_num: number of power levels.   10"""
         H2 = self.H2_set[:,:,self.count]            #current step H (count)
         p_extend = np.concatenate([P, np.zeros((1), dtype=dtype)], axis=0)       #concatenating a row of 0s (reference transmitter?)
         p_matrix = p_extend[self.p_array]     #mapping powers to their transmitters            
-        path_main = H2[:,0] * p_matrix[:,0]         #gain channel of transmitter-receiver pair 
-        path_inter = np.sum(H2[:,1:] * p_matrix[:,1:], axis=1)        #interference
+        path_main = H2[:,0] * p_matrix[:,0]         #gain channel of transmitter-receiver pair 100 values for each Ns
+        path_inter = np.sum(H2[:,1:] * p_matrix[:,1:], axis=1)        #interference  100 values for each Ns
         sinr = np.minimum(path_main / (path_inter + self.sigma2), maxC)    #comparison with max
         rate = self.W * np.log2(1. + sinr)   #formula
              
