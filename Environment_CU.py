@@ -97,7 +97,7 @@ power_num: number of power levels.   10"""
             for l in range(self.maxM):
                 for k in range(self.c):
                     for u in range(self.maxM):
-                        p_array[n*self.maxM+l,k*self.maxM+u] = path_matrix[Jy[k],Jx[k],u]       #distance between any two users, vertical dist, horizontal dist 
+                        p_array[n*self.maxM+l,k*self.maxM+u] = path_matrix[Jy[k],Jx[k],u]       #relative user number of a neighbour from a user. 
         p_main = p_array[:,(self.c-1)//2*self.maxM:(self.c+1)//2*self.maxM]                     
         for n in range(self.N):
             for l in range(self.maxM):
