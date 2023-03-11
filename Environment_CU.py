@@ -98,19 +98,19 @@ power_num: number of power levels.   10"""
                 for k in range(self.c):
                     for u in range(self.maxM):
                         p_array[n*self.maxM+l,k*self.maxM+u] = path_matrix[Jy[k],Jx[k],u]       #relative user number of a neighbour from a user. 
-        p_main = p_array[:,(self.c-1)//2*self.maxM:(self.c+1)//2*self.maxM]                  #p_main = [100,4]                 
+        p_main = p_array[:,(self.c-1)//2*self.maxM:(self.c+1)//2*self.maxM]                  #p_main = [100,4] gets the users of same base station.                
         for n in range(self.N):
             for l in range(self.maxM):
                 temp = p_main[n*self.maxM+l,l]
                 p_main[n*self.maxM+l,l] = p_main[n*self.maxM+l,0]
                 p_main[n*self.maxM+l,0] = temp
-        p_inter = np.hstack([p_array[:,:(self.c-1)//2*self.maxM], p_array[:,(self.c+1)//2*self.maxM:]])
-        p_array =  np.hstack([p_main, p_inter])
-        p_list = list()
+        p_inter = np.hstack([p_array[:,:(self.c-1)//2*self.maxM], p_array[:,(self.c+1)//2*self.maxM:]])   #users of neighbour bs leaving its own bs.
+        p_array =  np.hstack([p_main, p_inter])   #stack horizontally side by side
+        p_list = list()      
         for m in range(self.M):
             p_list_temp = list() 
             for k in range(self.K):
-                p_list_temp.append([p_array[m,k]])
+                p_list_temp.append([p_array[m,k]]) #p of each user-neighbour pair with first 4 index of same bs. 
             p_list.append(p_list_temp)           
         return p_array, p_list
     
