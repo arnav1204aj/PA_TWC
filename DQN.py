@@ -126,9 +126,9 @@ class DQN:
         self.FINAL_EPSILON = dnn.FINAL_EPSILON
         
         self.y = tf.placeholder(tf.float32, [None])
-        self.s = dnn.get_dqn_in(is_target=False)
-        self.a = dnn.get_action(is_target=False)
-        self.q_hat = dnn.get_dqn_out(is_target=False)
+        self.s = dnn.get_dqn_in(is_target=False)   #input tensor for s
+        self.a = dnn.get_action(is_target=False)   #action tensor
+        self.q_hat = dnn.get_dqn_out(is_target=False)  #output tensor of q values
         self.a_hat = tf.argmax(self.q_hat, 1)        #action with highest q value
         self.params = dnn.get_dqn_params(is_target=False)
         self.load = dnn.load_dqn_params
@@ -172,7 +172,7 @@ class DQN_target:
         self.sess = sess
         self.tau = tau
 
-        self.s = dnn.get_dqn_in(is_target=True)
+        self.s = dnn.get_dqn_in(is_target=True)   
         self.out = dnn.get_dqn_out(is_target=True)
         self.params = dnn.get_dqn_params(is_target=True)
         self.params_other = dnn.get_dqn_params(is_target=False)
