@@ -152,7 +152,7 @@ power_num: number of power levels.   10"""
         H2 = self.H2_set[:,:,self.count]            #current step H (count)
         p_extend = np.concatenate([P, np.zeros((1), dtype=dtype)], axis=0)       #concatenating a row of 0s (reference transmitter?)
         p_matrix = p_extend[self.p_array]     #mapping powers to their transmitters             
-        path_main = H2[:,0] * p_matrix[:,0]         #gain channel of transmitter-receiver pair (H2[:,0] has all receivers and p_matrix has transmitters)
+        path_main = H2[:,0] * p_matrix[:,0]         #gain channel of transmitter-receiver pair (H2[:,0] has all receivers and p_matrix has transmitters). We did relative numbering to form p_array so 0 is for the user itself
         path_inter = np.sum(H2[:,1:] * p_matrix[:,1:], axis=1)        #interference  (leave the first col as need only interference not main signal)
         sinr = np.minimum(path_main / (path_inter + self.sigma2), maxC)    #comparison with max
         rate = self.W * np.log2(1. + sinr)   #formula
