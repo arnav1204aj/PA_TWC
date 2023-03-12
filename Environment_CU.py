@@ -157,10 +157,10 @@ power_num: number of power levels.   10"""
         sinr = np.minimum(path_main / (path_inter + self.sigma2), maxC)    #comparison with max
         rate = self.W * np.log2(1. + sinr)   #formula
              
-        sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1])    #first col has int + noise, which is repeated K-1 times and divided with H2.
+        sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1])    #the transmission powers are repeated k-1 times to normalize all the terms of H2[:,1:] (interference) 
         sinr_norm_inv = np.log2(1. + sinr_norm_inv)   # log representation
         rate_extend = np.concatenate([rate, np.zeros((1), dtype=dtype)], axis=0) 
-        rate_matrix = rate_extend[self.p_array]
+        rate_matrix = rate_extend[self.p_array]  #rate_matrix takes rate values based on values of p_array.
         '''
         Calculate reward, sum-rate
         '''
