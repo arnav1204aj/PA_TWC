@@ -170,7 +170,7 @@ class DQN:
 class DQN_target:
     def __init__(self, sess, dnn, tau = 0.001):
         self.sess = sess
-        self.tau = tau
+        self.tau = tau    #learning rate?
 
         self.s = dnn.get_dqn_in(is_target=True)   
         self.out = dnn.get_dqn_out(is_target=True)
@@ -179,7 +179,7 @@ class DQN_target:
         self.load = dnn.load_dqn_target_params
         self.update_params = \
             [self.params[i].assign(tf.multiply(self.params_other[i], self.tau) + tf.multiply(self.params[i], 1. - self.tau))
-                for i in range(len(self.params))]
+                for i in range(len(self.params))]   #doubt
             
     def train(self):
         self.sess.run(self.update_params)
