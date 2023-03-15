@@ -179,7 +179,9 @@ power_num: number of power levels.   10"""
         '''
         sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1]) #first col has int + noise, which is repeated K-1 times and divided with H2.
         sinr_norm_inv = np.log2(1. + sinr_norm_inv)   # log representation
-        indices1 = np.tile(np.expand_dims(np.linspace(0, p_matrix.shape[0]-1, num=p_matrix.shape[0], dtype=np.int32), axis=1),[1,self.C])  #quantisation of power, selecting first C from rows of p_matrix
+        indices1 = np.tile(np.expand_dims(np.linspace(0, p_matrix.shape[0]-1, num=p_matrix.shape[0], dtype=np.int32), axis=1),[1,self.C])  #np.linspace(0, p_matrix.shape[0]-1, num=p_matrix.shape[0], dtype=np.int32) generates a 1D array of integers from 0 to p_matrix.shape[0]-1 (inclusive) with a total of p_matrix.shape[0] numbers evenly spaced apart. For example, if p_matrix.shape[0] is 5, this generates the array [0, 1, 2, 3, 4].
+                                                                                                                                           #np.expand_dims() adds an extra dimension to the 1D array generated in step 1 to make it a 2D column vector of shape (p_matrix.shape[0], 1).
+                                                                                                                                           #np.tile() creates a new 2D array by tiling the column vector generated in step 2 self.C times horizontally along the second axis (axis=1). This generates a 2D array of shape (p_matrix.shape[0], self.C) where each row contains the same self.C column vectors of the row indices of p_matrix.
         indices2 = np.argsort(sinr_norm_inv, axis = 1)[:,-self.C:]    #first sort then take the last self.C of each row (each user)
         sinr_norm_inv = sinr_norm_inv[indices1, indices2]       
         p_last = np.hstack([p_matrix[:,0:1], p_matrix[indices1, indices2+1]])
