@@ -180,7 +180,7 @@ power_num: number of power levels.   10"""
         sinr_norm_inv = H2[:,1:] / np.tile(H2[:,0:1], [1,self.K-1]) #first col has int + noise, which is repeated K-1 times and divided with H2.
         sinr_norm_inv = np.log2(1. + sinr_norm_inv)   # log representation
         indices1 = np.tile(np.expand_dims(np.linspace(0, p_matrix.shape[0]-1, num=p_matrix.shape[0], dtype=np.int32), axis=1),[1,self.C])  #quantisation of power, selecting first C from rows of p_matrix
-        indices2 = np.argsort(sinr_norm_inv, axis = 1)[:,-self.C:]    #Selecting first C SINR 
+        indices2 = np.argsort(sinr_norm_inv, axis = 1)[:,-self.C:]    #first sort then take the last self.C of each row (each user)
         sinr_norm_inv = sinr_norm_inv[indices1, indices2]       
         p_last = np.hstack([p_matrix[:,0:1], p_matrix[indices1, indices2+1]])
         rate_last = np.hstack([rate_matrix[:,0:1], rate_matrix[indices1, indices2+1]])
