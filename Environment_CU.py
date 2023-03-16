@@ -88,7 +88,7 @@ power_num: number of power levels.   10"""
             j = n%self.n_x     #col number
             Jx = np.zeros((0), dtype = np.int32)
             Jy = np.zeros((0), dtype = np.int32)
-            for u in range(i-self.L, i+self.L+1):
+            for u in range(i-self.L, i+self.L+1): #all neighbours (travel l neighbouring rows above and below and coordinate each bs of that row in a hex pattern)
                 v = 2*self.L+1-np.abs(u-i)     #hexagonal pattern
                 jx = j - (v-i%2)//2 + np.linspace(0, v-1, num = v, dtype = np.int32) + self.L      # we are making the coordinates in row-wise sense so for x coordinates
                 jy = np.ones((v), dtype = np.int32)*u + self.L                                     # we will have to divide in equally spaced v numbers, for y coordinate
@@ -97,7 +97,7 @@ power_num: number of power levels.   10"""
             for l in range(self.maxM):
                 for k in range(self.c):
                     for u in range(self.maxM):
-                        p_array[n*self.maxM+l,k*self.maxM+u] = path_matrix[Jy[k],Jx[k],u]       #relative user number of a neighbour from a user. 
+                        p_array[n*self.maxM+l,k*self.maxM+u] = path_matrix[Jy[k],Jx[k],u]       # user number of a neighbour of a user. 
         p_main = p_array[:,(self.c-1)//2*self.maxM:(self.c+1)//2*self.maxM]                  #p_main = [100,4] gets the users of same base station.                
         for n in range(self.N):
             for l in range(self.maxM):
