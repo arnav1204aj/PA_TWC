@@ -128,7 +128,7 @@ power_num: number of power levels.   10"""
                 for k in range(self.maxM):  
                     p_rx[i,j,k] = p_tx[i,j] + dis_rx[i,j,k]*np.cos(phi_rx[i,j,k])    #reach the transmitter and then reach the user (x)
                     p_ry[i,j,k] = p_ty[i,j] + dis_rx[i,j,k]*np.sin(phi_rx[i,j,k])    #reach the transmitter and then reach the user (y)
-        dis = 1e10 * np.ones((self.p_array.shape[0], self.K), dtype = dtype)  # user and its neighbours [101,76]
+        dis = 1e10 * np.ones((self.p_array.shape[0], self.K), dtype = dtype)  # user and its neighbours [100,76]
         lognormal = np.random.lognormal(size = (self.p_array.shape[0], self.K), sigma = 8)  # dist of X such that logX follows a normal distribution, sigma is the width of the dist. it accounts for obstacles in the environment. 
         for k in range(self.p_array.shape[0]):  #choosing user
             for i in range(self.c): #choosing nbour bs
