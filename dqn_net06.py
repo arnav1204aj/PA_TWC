@@ -53,8 +53,8 @@ def Train(sess, env, weight_file):
             s_actor = s_actor_next     
             reward_dqn_list.append(r)
         if deque.size() > batch_size:                 #size>batchsize then train using data sampled till now
-            batch_s, batch_a, batch_r = deque.sample_batch(batch_size)   #see this
-            dqn.train(batch_s, batch_a, batch_r)
+            batch_s, batch_a, batch_r = deque.sample_batch(batch_size)   #random sample of 500
+            dqn.train(batch_s, batch_a, batch_r) #train on this sample
             
         reward_hist.append(np.mean(reward_dqn_list))   # mean reward of one episode
         if k % interval == 0: 
